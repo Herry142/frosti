@@ -11,6 +11,14 @@ function App() {
       loginPlaceholder: "Логін",
       passwordPlaceholder: "Пароль",
       loginButton: "Увійти",
+      registerTextButton: "Зареєструватись",
+      registerTitle: "Реєстрація",
+      emailPlaceholder: "Електронна пошта",
+      fullNamePlaceholder: "Повне ім'я",
+      passwordPlaceholderReg: "Пароль",
+      confirmPasswordPlaceholder: "Підтвердіть пароль",
+      privacyPolicyCheckbox: "Я погоджуюсь з обробкою персональних даних",
+      registerSubmitButton: "Зареєструватись",
       settings: "Налаштування",
       account: "Акаунт",
       theme: "Тема",
@@ -18,7 +26,7 @@ function App() {
       night: "Ніч",
       day: "День",
       ukrainian: "Українська",
-      english: "Англійська",
+      english: "English",
       logout: "Вийти",
       logoutAlert: "Ви вийшли!",
       create: "Створити",
@@ -28,6 +36,10 @@ function App() {
       createModalButton: "Створити",
       cancel: "Скасувати",
       searchPlaceholder: "Пошук...",
+      projects: "Проєкти",
+      blocks: "Блоки",
+      tasks: "Завдання",
+      goals: "Цілі",
     },
     en: {
       locale: 'en',
@@ -37,6 +49,14 @@ function App() {
       loginPlaceholder: "Login",
       passwordPlaceholder: "Password",
       loginButton: "Log In",
+      registerTextButton: "Register",
+      registerTitle: "Registration",
+      emailPlaceholder: "Email",
+      fullNamePlaceholder: "Full Name",
+      passwordPlaceholderReg: "Password",
+      confirmPasswordPlaceholder: "Confirm Password",
+      privacyPolicyCheckbox: "I agree to the processing of personal data",
+      registerSubmitButton: "Register",
       settings: "Settings",
       account: "Account",
       theme: "Theme",
@@ -54,6 +74,10 @@ function App() {
       createModalButton: "Create",
       cancel: "Cancel",
       searchPlaceholder: "Search...",
+      projects: "Projects",
+      blocks: "Blocks",
+      tasks: "Tasks",
+      goals: "Goals",
     },
   };
 
@@ -62,13 +86,16 @@ function App() {
   const [currentLanguage, setCurrentLanguage] = useState(translations['uk']);
   const [languageTransition, setLanguageTransition] = useState(false);
   const [launched, setLaunched] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [showLoginWindow, setShowLoginWindow] = useState(false);
+  const [showRegisterWindow, setShowRegisterWindow] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [stars, setStars] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isDropdownClosing, setIsDropdownClosing] = useState(false);
-  const [formPosition, setFormPosition] = useState({ top: '50%', left: '50%', scale: 1, opacity: 0 });
+  const [formPosition, setFormPosition] = useState({ top: '50%', left: '50%', scale: 0.8, opacity: 0 });
   const [animateForm, setAnimateForm] = useState(false);
   const [showTopBar, setShowTopBar] = useState(false);
+  const [showLeftPanel, setShowLeftPanel] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [isSettingsClosing, setIsSettingsClosing] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
@@ -79,7 +106,11 @@ function App() {
   const settingsButtonRef = useRef(null);
   const [rotation, setRotation] = useState(0);
   const [isRotating, setIsRotating] = useState(false);
-  const [searchText, setSearchText] = useState(''); // Стан для відстеження тексту пошуку
+  const [searchText, setSearchText] = useState('');
+  const [formVisible, setFormVisible] = useState(false);
+  const [registerFormPosition, setRegisterFormPosition] = useState({ opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' });
+  const [mainMenuVisible, setMainMenuVisible] = useState(false);
+  const [mainMenuOpacity, setMainMenuOpacity] = useState(0);
 
   useEffect(() => {
     if (language !== currentLanguage.locale) {
@@ -108,32 +139,87 @@ function App() {
 
   useEffect(() => {
     document.body.style.overflow =
-      showForm || dropdownOpen || showSettingsModal || showAccountModal || showLogoutMessage || showCreateModal
+      showLoginWindow || dropdownOpen || showSettingsModal || showAccountModal || showLogoutMessage || showCreateModal || showRegisterWindow
         ? "hidden"
         : "auto";
-  }, [showForm, dropdownOpen, showSettingsModal, showAccountModal, showLogoutMessage, showCreateModal]);
+  }, [showLoginWindow, dropdownOpen, showSettingsModal, showAccountModal, showLogoutMessage, showCreateModal, showRegisterWindow]);
 
   const handleMagicButtonClick = () => {
     if (!launched) {
       setLaunched(true);
       setTimeout(() => {
-        setShowForm(true);
+        setFormVisible(true);
         setTimeout(() => {
-          setFormPosition((prev) => ({ ...prev, opacity: 1 }));
-        }, 50);
-      }, 1000);
+          setFormPosition((prev) => ({ ...prev, opacity: 1, scale: 1 }));
+        }, 300); // Збільшено час для плавнішого переходу
+      }, 500); // Зменшено затримку для швидшого показу форми
     }
   };
 
   const handleLoginButtonClick = () => {
     setAnimateForm(true);
-    setFormPosition((prev) => ({ ...prev, top: '50%', left: 'calc(100% - 100px)', scale: 0.8 }));
+    setFormPosition((prev) => ({ ...prev, opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' }));
     setTimeout(() => {
-      setFormPosition((prev) => ({ ...prev, top: '10%', left: 'calc(100% - 120px)', scale: 0.6, opacity: 0 }));
+      setShowLoginWindow(false);
+      setMainMenuVisible(true);
       setTimeout(() => {
+        setMainMenuOpacity(1);
         setShowTopBar(true);
-      }, 500);
-    }, 500);
+        setShowLeftPanel(true);
+      }, 300);
+    }, 300);
+  };
+
+  const handleRegisterTextButtonClick = () => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setFormPosition((prev) => ({ ...prev, opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' }));
+      setTimeout(() => {
+        setShowLoginWindow(false);
+        setShowRegisterWindow(true);
+        setTimeout(() => {
+          setRegisterFormPosition({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' });
+          setIsTransitioning(false);
+        }, 300);
+      }, 300);
+    }
+  };
+
+  const handleRegisterSubmit = (event) => {
+    event.preventDefault();
+    // Тут можна додати логіку для відправки даних реєстрації
+    console.log("Дані реєстрації:", {
+      email: event.target.email.value,
+      fullName: event.target.fullName.value,
+      password: event.target.password.value,
+      confirmPassword: event.target.confirmPassword.value,
+      privacyPolicy: event.target.privacyPolicy.checked,
+    });
+    setIsTransitioning(true);
+    setRegisterFormPosition({ opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' });
+    setTimeout(() => {
+      setShowRegisterWindow(false);
+      setShowLoginWindow(true);
+      setTimeout(() => {
+        setFormPosition({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' });
+        setIsTransitioning(false);
+      }, 300);
+    }, 300);
+  };
+
+  const handleBackToLogin = () => {
+    if (!isTransitioning) {
+      setIsTransitioning(true);
+      setRegisterFormPosition({ opacity: 0, transform: 'translate(-50%, -50%) scale(0.8)' });
+      setTimeout(() => {
+        setShowRegisterWindow(false);
+        setShowLoginWindow(true);
+        setTimeout(() => {
+          setFormPosition({ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' });
+          setIsTransitioning(false);
+        }, 300);
+      }, 300);
+    }
   };
 
   const toggleDropdown = () => {
@@ -189,10 +275,13 @@ function App() {
   };
 
   const handleLogout = () => {
-    setShowForm(false);
+    setMainMenuVisible(false);
+    setMainMenuOpacity(0);
     setShowTopBar(false);
+    setShowLeftPanel(false);
     setLaunched(false);
-    setFormPosition({ top: '50%', left: '50%', scale: 1, opacity: 0 });
+    setFormVisible(false);
+    setFormPosition({ top: '50%', left: '50%', scale: 0.8, opacity: 0 });
     setAnimateForm(false);
     setDropdownOpen(false);
     setIsDropdownClosing(false);
@@ -221,14 +310,12 @@ function App() {
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
-    // Тут ви можете додати логіку фільтрації або пошуку на основі searchText
     console.log("Текст пошуку:", event.target.value);
   };
 
   const handleCreateSubmit = () => {
     const title = document.getElementById("create-title").value;
     const description = document.getElementById("create-description").value;
-    // Тут додайте логіку для створення нового об'єкта (наприклад, відправка на сервер)
     console.log("Створено:", { title, description });
     closeCreateModal();
   };
@@ -248,7 +335,7 @@ function App() {
                 placeholder={currentLanguage.searchPlaceholder || "Пошук..."}
                 className="search-input"
                 value={searchText}
-                onChange={handleSearchChange} // Додано обробник зміни тексту
+                onChange={handleSearchChange}
               />
             </div>
           </div>
@@ -298,118 +385,142 @@ function App() {
         ))}
       </div>
 
-      <div className={`content ${showTopBar ? 'top-bar-visible' : ''}`} style={{ paddingTop: showTopBar ? '48px' : '0', display: 'flex' }}>
-        <div className="left-panel">
-          <div className="left-panel-items">
-            <div className="panel-item">Проєкти</div>
-            <div className="panel-item">Блоки</div>
-            <div className="panel-item">Завдання</div>
-            <div className="panel-item">Цілі</div>
-            {/* Додайте інші елементи панелі тут */}
+      <div className={`content ${showTopBar ? 'top-bar-visible' : ''} ${showLeftPanel ? 'left-panel-visible' : ''}`}>
+        {showLeftPanel && (
+          <div className="left-panel" style={{ opacity: mainMenuOpacity, transition: 'opacity 0.3s ease-in-out' }}>
+            <div className="left-panel-items">
+              <div className="panel-item">{currentLanguage.projects}</div>
+              <div className="panel-item">{currentLanguage.blocks}</div>
+              <div className="panel-item">{currentLanguage.tasks}</div>
+              <div className="panel-item">{currentLanguage.goals}</div>
+              {/* Додайте інші елементи панелі тут */}
+            </div>
           </div>
-        </div>
-        <div style={{ flexGrow: 1 }}>
+        )}
+        <div className="initial-content" style={{ display: !launched ? 'flex' : 'none', opacity: launched ? 0 : 1, transition: 'opacity 0.5s ease-in-out' }}>
           <h1 className={`greeting ${launched ? "fadeOut" : ""} fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.greeting}</h1>
           <button
             className={`magic-button ${launched ? "launched" : ""}`}
             onClick={handleMagicButtonClick}
             disabled={launched}
+            style={{ opacity: launched ? 0.5 : 1, transition: 'opacity 0.5s ease-in-out 0.2s' }}
           >
             {currentLanguage.forwardButton}
           </button>
         </div>
+
+        {formVisible && (
+          <div className={`login-window ${animateForm ? 'animate' : ''} ${showLoginWindow ? 'show' : ''}`} style={{
+            transform: `translate(-50%, -50%) scale(${formPosition.scale})`,
+            opacity: formPosition.opacity,
+            transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+          }}>
+            <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.loginTitle}</h2>
+            <input type="text" placeholder={currentLanguage.loginPlaceholder} />
+            <input type="password" placeholder={currentLanguage.passwordPlaceholder} />
+            <button className="login-button" onClick={handleLoginButtonClick} style={{ transition: 'opacity 0.3s ease-in-out 0.3s' }}>{currentLanguage.loginButton}</button>
+            <button className="register-text-button" onClick={handleRegisterTextButtonClick} style={{ transition: 'opacity 0.3s ease-in-out 0.5s' }}>{currentLanguage.registerTextButton}</button>
+          </div>
+        )}
+
+        {showRegisterWindow && (
+          <div className={`register-form-window ${isTransitioning ? 'fade-transition' : 'show'}`} style={{
+            opacity: registerFormPosition.opacity,
+            transform: registerFormPosition.transform,
+            transition: 'opacity 0.3s ease 0.3s, transform 0.3s ease 0.3s',
+          }}>
+            <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.registerTitle}</h2>
+            <form onSubmit={handleRegisterSubmit}>
+              <input type="email" name="email" placeholder={currentLanguage.emailPlaceholder} required />
+              <input type="text" name="fullName" placeholder={currentLanguage.fullNamePlaceholder} required />
+              <input type="password" name="password" placeholder={currentLanguage.passwordPlaceholderReg} required />
+              <input type="password" name="confirmPassword" placeholder={currentLanguage.confirmPasswordPlaceholder} required />
+              <label className="privacy-policy-label">
+                <input type="checkbox" name="privacyPolicy" required />
+                <span className="privacy-policy-text">{currentLanguage.privacyPolicyCheckbox}</span>
+              </label>
+              <button type="submit" className="register-submit-button">{currentLanguage.registerSubmitButton}</button>
+              <button type="button" className="back-to-login-button" onClick={handleBackToLogin}>{currentLanguage.loginTitle}</button>
+            </form>
+          </div>
+        )}
+
+        {showSettingsModal && (
+          <div className={`settings-modal ${isSettingsClosing ? 'closing' : 'open'}`}>
+            <div className="settings-modal-content">
+              <span className="close-button" onClick={closeSettingsModal}>&times;</span>
+              <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.settings}</h2>
+              <div className="setting-group">
+                <h3 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.theme}</h3>
+                <button
+                  onClick={() => setTheme('dark')}
+                  className={theme === 'dark' ? 'active' : ''}
+                >
+                  {currentLanguage.night}
+                </button>
+                <button
+                  onClick={() => setTheme('light')}
+                  className={theme === 'light' ? 'active' : ''}
+                >
+                  {currentLanguage.day}
+                </button>
+              </div>
+              <div className="setting-group">
+                <h3 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.language}</h3>
+                <button
+                  onClick={() => handleSetLanguage('uk')}
+                  className={language === 'uk' ? 'active' : ''}
+                >
+                  {currentLanguage.ukrainian}
+                </button>
+                <button
+                  onClick={() => handleSetLanguage('en')}
+                  className={language === 'en' ? 'active' : ''}
+                >
+                  {currentLanguage.english}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAccountModal && (
+          <div className={`settings-modal ${isAccountClosing ? 'closing' : 'open'}`}>
+            <div className="settings-modal-content">
+              <span className="close-button" onClick={closeAccountModal}>&times;</span>
+              <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.account}</h2>
+              {/* Тут може бути інформація про акаунт */}
+            </div>
+          </div>
+        )}
+
+        {showLogoutMessage && (
+          <div className="logout-message-modal open">
+            {currentLanguage.logoutAlert}
+          </div>
+        )}
+
+        {showCreateModal && (
+          <div className={`settings-modal ${isCreateModalClosing ? 'closing' : 'open'}`}>
+            <div className="settings-modal-content">
+              <span className="close-button" onClick={closeCreateModal}>&times;</span>
+              <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalTitle}</h2>
+              <div className="setting-group">
+                <label htmlFor="create-title" className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalField1}:</label>
+                <input type="text" id="create-title" />
+              </div>
+              <div className="setting-group">
+                <label htmlFor="create-description" className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalField2}:</label>
+                <textarea id="create-description"></textarea>
+              </div>
+              <div className="modal-actions">
+                <button onClick={handleCreateSubmit} className="create-action-button">{currentLanguage.createModalButton}</button>
+                <button onClick={closeCreateModal} className="cancel-button">{currentLanguage.cancel}</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {showForm && (
-        <div className={`login-window ${animateForm ? 'animate' : 'show'}`} style={{
-          top: formPosition.top,
-          left: formPosition.left,
-          transform: `translate(-50%, -50%) scale(${formPosition.scale})`,
-          opacity: formPosition.opacity,
-          transition: 'opacity 0.4s ease, transform 0.8s ease, top 0.8s ease, left 0.8s ease'
-        }}>
-          <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.loginTitle}</h2>
-          <input type="text" placeholder={currentLanguage.loginPlaceholder} />
-          <input type="password" placeholder={currentLanguage.passwordPlaceholder} />
-          <button onClick={handleLoginButtonClick}>{currentLanguage.loginButton}</button>
-        </div>
-      )}
-
-      {showSettingsModal && (
-        <div className={`settings-modal ${isSettingsClosing ? 'closing' : 'open'}`}>
-          <div className="settings-modal-content">
-            <span className="close-button" onClick={closeSettingsModal}>&times;</span>
-            <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.settings}</h2>
-            <div className="setting-group">
-              <h3 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.theme}</h3>
-              <button
-                onClick={() => setTheme('dark')}
-                className={theme === 'dark' ? 'active' : ''}
-              >
-                {currentLanguage.night}
-              </button>
-              <button
-                onClick={() => setTheme('light')}
-                className={theme === 'light' ? 'active' : ''}
-              >
-                {currentLanguage.day}
-              </button>
-            </div>
-            <div className="setting-group">
-              <h3 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.language}</h3>
-              <button
-                onClick={() => handleSetLanguage('uk')}
-                className={language === 'uk' ? 'active' : ''}
-              >
-                {currentLanguage.ukrainian}
-              </button>
-              <button
-                onClick={() => handleSetLanguage('en')}
-                className={language === 'en' ? 'active' : ''}
-              >
-                {currentLanguage.english}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showAccountModal && (
-        <div className={`settings-modal ${isAccountClosing ? 'closing' : 'open'}`}>
-          <div className="settings-modal-content">
-            <span className="close-button" onClick={closeAccountModal}>&times;</span>
-            <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.account}</h2>
-            {/* Тут може бути інформація про акаунт */}
-          </div>
-        </div>
-      )}
-
-      {showLogoutMessage && (
-        <div className="logout-message-modal open">
-          {currentLanguage.logoutAlert}
-        </div>
-      )}
-
-      {showCreateModal && (
-        <div className={`settings-modal ${isCreateModalClosing ? 'closing' : 'open'}`}>
-          <div className="settings-modal-content">
-            <span className="close-button" onClick={closeCreateModal}>&times;</span>
-            <h2 className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalTitle}</h2>
-            <div className="setting-group">
-              <label htmlFor="create-title" className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalField1}:</label>
-              <input type="text" id="create-title" />
-            </div>
-            <div className="setting-group">
-              <label htmlFor="create-description" className={`fade-transition ${languageTransition ? 'fade-out' : ''}`}>{currentLanguage.createModalField2}:</label>
-              <textarea id="create-description"></textarea>
-            </div>
-            <div className="modal-actions">
-              <button onClick={handleCreateSubmit} className="create-action-button">{currentLanguage.createModalButton}</button>
-              <button onClick={closeCreateModal} className="cancel-button">{currentLanguage.cancel}</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
