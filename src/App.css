@@ -3,7 +3,7 @@ body, html, #root {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', sans-serif;
-  overflow: hidden;
+  overflow: hidden; /* Забороняємо прокрутку сторінки */
   scroll-behavior: smooth;
 }
 
@@ -14,6 +14,8 @@ body, html, #root {
   overflow: hidden;
   transition: background 0.5s ease, color 0.5s ease;
   display: flex;
+  justify-content: center; /* Вирівнюємо контент по центру горизонтально */
+  align-items: center; /* Вирівнюємо контент по центру вертикально */
 }
 
 /* Стилі для лівої панелі */
@@ -232,11 +234,25 @@ body, html, #root {
   padding-top: 48px;
   flex-grow: 1;
   box-sizing: border-box;
-  margin-left: 200px;
+  margin-left: 0; /* Ліва панель спочатку невидима */
+  transition: margin-left 0.5s ease;
+}
+
+.content.left-panel-visible {
+  margin-left: 200px; /* Зміщуємо контент, коли ліва панель видима */
 }
 
 .content.top-bar-visible {
   padding-top: 48px;
+}
+
+.initial-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .greeting {
@@ -315,19 +331,16 @@ body, html, #root {
   width: 320px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.5s ease, transform 0.8s ease, top 0.8s ease, left 0.8s ease, background-color 0.5s ease, color 0.5s ease;
+  transition: opacity 0.3s ease, transform0.3s ease;
   z-index: 3;
 }
 
 .login-window.show {
   opacity: 1;
-  transform: translate(20%, -50%) scale(0.5);
-  top: 10px;
-  left: auto;
-  right: 10px;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 
@@ -336,12 +349,13 @@ body, html, #root {
   font-size: 1.5rem;
   font-weight: bold;
   transition: color 0.5s ease;
+  text-decoration: none; /* Забираємо підкреслення */
 }
 
 .login-window input {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
+  margin-bottom: 15px;
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 1rem;
@@ -350,7 +364,7 @@ body, html, #root {
   transition: border-color 0.5s ease, color 0.5s ease, background-color 0.5s ease;
 }
 
-.login-window button {
+.login-window button.login-button {
   background-color: #3b82f6;
   color: white;
   padding: 12px;
@@ -361,10 +375,10 @@ body, html, #root {
   font-size: 1rem;
   margin-top: 15px;
   font-family: 'Roboto', sans-serif;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.login-window button:hover {
+.login-window button.login-button:hover {
   background-color: #2563eb;
 }
 
@@ -784,7 +798,6 @@ body, html, #root {
   color: #212121;
   background-color: #e8f5e9;
 }
-
 .top-bar-dropdown {
   opacity: 0;
   visibility: hidden;
@@ -797,6 +810,193 @@ body, html, #root {
   right: 45px;
   transform: translateX(0) translateY(0);
 }
+
+.top-bar-dropdown.closing {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(0) translateY(5px);
+  transition: opacity 0.3s ease, visibility 0.3s ease 0.3s, transform 0.3s ease;
+}
+
+.register-form-window {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: #1f2937;
+  color: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease 0.3s, transform 0.3s ease 0.3s;
+  z-index: 3;
+}
+
+.register-form-window.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.register-form-window h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  transition: color 0.5s ease;
+  text-align: center;
+}
+
+.register-form-window input[type="email"],
+.register-form-window input[type="text"],
+.register-form-window input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+  transition: border-color 0.5s ease, color 0.5s ease, background-color 0.5s ease;
+}
+
+.register-form-window input[type="checkbox"] {
+  width: auto;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.register-form-window label.privacy-policy-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 0.9rem; /* Зменшуємо розмір тексту */
+}
+
+.register-form-window input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.register-form-window button[type="submit"] {
+  background-color: #3b82f6; /* Синій колір кнопки "Зареєструватись" */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  margin-top: 15px;
+  font-family: 'Roboto', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.register-form-window button[type="submit"]:hover {
+  background-color: #2563eb;
+}
+
+.back-to-login-button {
+  background-color: transparent;
+  color: #81d4fa;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none; /* Забираємо підкреслення */
+  transition: color 0.3s ease;
+  margin-top: 10px;
+}
+
+.back-to-login-button:hover {
+  color: #4fc3f7;
+}
+
+.login-window .register-text-button {
+  background: none;
+  border: none;
+  color: #81d4fa;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: none; /* Забираємо підсвічування синім */
+  margin-top: 10px;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.login-window .register-text-button:hover {
+  color: #4fc3f7;
+}
+
+.light-theme .login-window .register-text-button {
+  color: #64b5f6;
+}
+
+.light-theme .login-window .register-text-button:hover {
+  color: #42a5f5;
+}
+
+.light-theme .register-form-window {
+  background-color: #fff8e1;
+  color: #212121;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.light-theme .register-form-window h2 {
+  color: #212121;
+  transition: color 0.5s ease;
+}
+
+.light-theme .register-form-window input[type="email"],
+.light-theme .register-form-window input[type="text"],
+.light-theme .register-form-window input[type="password"] {
+  border-color: #ffeb3b;
+  color: #212121;
+  background-color: #fffacd;
+}
+
+.light-theme .register-form-window button[type="submit"] {
+  background-color: #64b5f6; /* Синій колір кнопки "Зареєструватись" у світлій темі */
+  color: #212121;
+}
+
+.light-theme .register-form-window button[type="submit"]:hover {
+  background-color: #42a5f5;
+}
+
+.light-theme .back-to-login-button {
+  color: #64b5f6;
+}
+
+.light-theme .back-to-login-button:hover {
+  color: #42a5f5;
+}
+
+.register-form-window .privacy-policy-text {
+  font-size: 0.8rem; /* Ще трохи зменшуємо */
+  margin-left: 5px;
+}
+
+.light-theme .register-form-window .privacy-policy-text {
+  color: #212121;
+}
+
+
+
+
+
+
+
+
+
+
 
 .top-bar-dropdown.closing {
   opacity: 0;
@@ -843,4 +1043,266 @@ body, html, #root {
   right: -50px; /* Відступ, щоб лінія була до правого блоку */
 }
 
-/* Стилі для основного вмісту перенесені вище */
+.magic-button {
+  /* Ваші існуючі стилі */
+  transition: opacity 0.5s ease-in-out; /* Додайте плавний перехід для opacity */
+}
+
+.magic-button.launched {
+  opacity: 0; /* Зробіть кнопку прозорою після натискання */
+  visibility: hidden; /* Приховайте елемент після зникнення */
+}
+
+.greeting {
+  /* Ваші існуючі стилі */
+  transition: opacity 0.5s ease-in-out; /* Додайте плавний перехід для opacity */
+}
+
+.greeting.fadeOut {
+  opacity: 0; /* Зробіть привітання прозорим */
+  visibility: hidden; /* Приховайте елемент після зникнення */
+}
+
+.login-window {
+  /* Ваші існуючі стилі */
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Додайте плавні переходи */
+}
+
+.login-window.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.left-panel {
+  /* Ваші існуючі стилі */
+  position: fixed;
+  top: 0; /* Початкове положення зверху */
+  left: 0;
+  height: 100vh; /* На всю висоту вікна */
+  /* Інші стилі */
+}
+
+.content.top-bar-visible .left-panel {
+  top: 60px; /* Змістіть вниз на висоту top-bar */
+  height: calc(100vh); /* Зменшіть висоту на висоту top-bar */
+}
+
+.settings-dropdown {
+  display: none; /* ховаємо */
+  position: absolute;
+  top: 40px; /* або як тобі треба */
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 100;
+}
+
+.settings-dropdown.active {
+  display: block;
+}
+
+.settings-btn {
+  display: none; /* схований */
+}
+
+.settings-btn.visible {
+  display: block; /* або flex */
+}
+
+.settings-btn {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  pointer-events: none; /* Щоб не ловила кліки до появи */
+}
+
+.settings-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.initial-content {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.initial-content.fadeOut {
+  opacity: 0;
+}
+
+.magic-button {
+  transition: opacity 0.5s ease-in-out 0.2s;
+}
+
+.login-window {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.login-window.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.login-window.animate {
+  transform: translate(calc(100% - 100px), 10%) scale(0.6);
+  opacity: 0;
+}
+
+.login-button {
+  transition: opacity 0.3s ease-in-out 0.3s;
+}
+
+.content.left-panel-visible .left-panel {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.left-panel {
+  transform: translateX(-200px);
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 0;
+}
+
+.top-bar.visible {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.top-bar {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+/* Кнопка "Вперед" */
+.magic-button {
+  background-color: #1e90ff;
+  color: white;
+  padding: 12px 24px;
+  font-size: 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.magic-button:hover {
+  transform: scale(1.05);
+  background-color: #0077cc;
+}
+
+.magic-button.launched {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Вікно логіну */
+.login-window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  background-color: #1f2937;
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  z-index: 1000;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.login-window.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* Кнопки всередині форми */
+.login-button, .register-text-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.login-button:hover, .register-text-button:hover {
+  background-color: #1d4ed8;
+}
+
+/* Основне меню після входу */
+.left-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100%;
+  background-color: #111827;
+  padding: 20px;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 900;
+}
+
+.left-panel-visible .left-panel {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #1f2937;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 1000;
+}
+
+.top-bar.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Перехід */
+.fade-transition {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-out {
+  opacity: 0 !important;
+}
+
+.register-text-button {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
